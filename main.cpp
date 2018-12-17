@@ -2,7 +2,6 @@
 //  main.cpp
 //  islam.p4
 //
-
 //main.cpp
 
 #include <iostream>
@@ -88,14 +87,9 @@ int main(int argc, char* argv[])
     
     //Close the input file
     input_file.close();
-    
-    node_t* root = parser();
-    
-    cout <<"Semantic Check Started\n";
+    Node *root = parser();
     staticSemantics(root);
-    cout <<"Semantic Check Complete. Code Generated to out.asm \n";
-    preorder(root, root->level);
-    
+    //preorder(root, root->level);
     target_file.close();
     
     return 0; //main

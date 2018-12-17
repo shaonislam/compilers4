@@ -7,13 +7,8 @@
 
 #ifndef testTree_hpp
 #define testTree_hpp
-
 #include <stdio.h>
 #include "node.hpp"
-
 using namespace std;
-
-void preorder(node_t*, int);
-
-
+void preorder(Node*, int);
 #endif /* testTree_hpp */

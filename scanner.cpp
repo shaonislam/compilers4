@@ -2,7 +2,6 @@
 //  scanner.cpp
 //  islam.p4
 //
-//  Created by Shaon Islam on 12/16/18.
 //  Copyright © 2018 Shaon Islam. All rights reserved.
 //
 
@@ -30,8 +29,8 @@ static int comment_flag;
 //function to read in from file input
 void read_file(istream &in)
 {
-    populate_operator_map();
-    populate_keyword_map();
+    setupOperators();
+    setupKeywords();
     
     string input_line;
     current_index = 0;
@@ -146,7 +145,7 @@ string get_string()
     return file_string[line_index];
 }
 
-//----------------------------------------------------
+
 int scanner(Token &token)
 {
     string input_string = get_string();
@@ -242,7 +241,7 @@ int scanner(Token &token)
     
     return -1;
 }
-//--------------------------------------------------
+
 //get the column with the input
 int get_column(char ch)
 {

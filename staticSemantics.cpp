@@ -2,7 +2,6 @@
 //  staticSemantics.cpp
 //  islam.p4
 //
-//  Created by Shaon Islam on 12/17/18.
 //  Copyright © 2018 Shaon Islam. All rights reserved.
 //
 
@@ -17,35 +16,16 @@
 #include <iomanip>
 
 using namespace std;
-
-// max stack size
-// const int MAX_VARS = 100;
-
-//Var scope
 static int var_scope = 0;
-
-//temp vars
 static int temp_vars = 0;
-
 static int num_repeat = 0;
-
-//stack temp
 static stack_tt temp;
-
-//vector stack for vars
-vector<stack_tt> stackk;
-
-//location on stack
-int stack_location = 0;
-
-//Total vars on stack
-int stack_vars = 0;
+vector<stack_tt> stackk; //vector stack for vars
+int stack_location = 0; // Placement in stack
+int stack_vars = 0; // Number of vars in stack
 
 
-
-
-
-// check local and global scopes
+// Going through -checking Locals and Globals
 int compare_scope(stack_tt var)
 {
     int var_location = check_var_exists(var);
@@ -54,9 +34,9 @@ int compare_scope(stack_tt var)
     {
         if (stackk.at(var_location).scope > var.scope)
         {
-            cout << "Error: staticSemantics  variable \'" << get_token_desc(var.token)
+            cout << "Error from Static Semantics for:  variable \'" << get_token_desc(var.token)
             << "\' on line " << var.token.line_number <<
-            " cannot be accessed in this scope.\n";
+            " cannot be retrieved in this scope.\n";
             exit(EXIT_FAILURE);
         }
         else
@@ -65,15 +45,14 @@ int compare_scope(stack_tt var)
     else
     {
         
-        cout << "Error: staticSemantics variable \'" << get_token_desc(var.token)
+        cout << "Error from Static Semantics variable \'" << get_token_desc(var.token)
         << "\' on line " << var.token.line_number <<
-        " is not on the stack, and has either not yet been defined OR "
-        << "cannot be accessed in this scope.\n";
+        " is not on the stack\n";
         exit(EXIT_FAILURE);
     }
 }
 
-void staticSemantics(node_t *root)
+void staticSemantics(Node *root)
 {
     if (root == NULL)
         return;
@@ -99,7 +78,7 @@ void staticSemantics(node_t *root)
         return;
     }
     
-    // <block> -> begin <vars> <stats> end
+    // <block>: start <vars> <stats> stop
     if (root->label == "<block>")
     {
         var_scope++;
@@ -111,7 +90,7 @@ void staticSemantics(node_t *root)
         var_scope--;
     }
     
-    // <vars> -> empty | let Identifier = Integer <vars>
+    // <vars>: empty | var Identifier = Integer <vars>
     if (root->label == "<vars>")
     {
         temp.token = root->tokens.front();
@@ -126,7 +105,7 @@ void staticSemantics(node_t *root)
         }
     }
     
-    // <expr> -> <A> / <expr> | <A> * <expr> | <A>
+    // <expr>: <A> / <expr> | <A> * <expr> | <A>
     if (root->label == "<expr>")
     {
         if (root->tokens.empty())
@@ -140,11 +119,11 @@ void staticSemantics(node_t *root)
             target_file << "STORE T" << local_var << "\n";
             staticSemantics(root->child_1);
             
-            if (operator_map[root->tokens.at(0).desc] == "SLASH_tk")
+            if (operator_map[root->tokens.at(0).desc] == "slash_tk")
             {
                 target_file << "DIV T" << local_var << "\n";
             }
-            else if (operator_map[root->tokens.at(0).desc] == "ASTERIK_tk")
+            else if (operator_map[root->tokens.at(0).desc] == "asterisk_tk")
             {
                 
                 target_file << "MULT T" << local_var << "\n";
@@ -153,7 +132,7 @@ void staticSemantics(node_t *root)
         }
     }
     
-    // <A> -> <M> + <A> | <M> - <A> | <M>
+    // <A>: <M> + <A> | <M> - <A> | <M>
     if (root->label == "<A>")
     {
         if (root->tokens.empty())
@@ -167,11 +146,11 @@ void staticSemantics(node_t *root)
             target_file << "STORE T" << local_var << "\n";
             staticSemantics(root->child_1);
             
-            if (operator_map[root->tokens.at(0).desc] == "PLUS_tk")
+            if (operator_map[root->tokens.at(0).desc] == "plus_tk")
             {
                 target_file << "ADD T" << local_var << "\n";
             }
-            else if (operator_map[root->tokens.at(0).desc] == "MINUS_tk")
+            else if (operator_map[root->tokens.at(0).desc] == "minus_tk")
             {
                 target_file << "SUB T" << local_var << "\n";
             }
@@ -179,7 +158,7 @@ void staticSemantics(node_t *root)
         }
     }
     
-    // <M> -> -<M> | <R>
+    // <M>: -<M> | <R>
     if (root->label == "<M>")
     {
         staticSemantics(root->child_1);
@@ -191,7 +170,7 @@ void staticSemantics(node_t *root)
         return;
     }
     
-    // <R> -> (<expr>) | Identifier | Integer
+    // <R>: (<expr>) | Identifier | Integer
     if (root->label == "<R>")
     {
         if (root->tokens.empty())
@@ -215,20 +194,20 @@ void staticSemantics(node_t *root)
         }
     }
     
-    // <stats> -> <stat> <mStat>
+    // <stats>: <stat> <mStat>
     if (root->label == "<stats>")
     {
         staticSemantics(root->child_1);
         staticSemantics(root->child_2);
     }
     
-    // <stat> -> <in> | <out> | <block> | <if> | <loop> | <assign>
+    // <stat>: <in> | <out> | <block> | <if> | <loop> | <assign>
     if (root->label == "<stat>")
     {
         staticSemantics(root->child_1);
     }
     
-    // <mStat> -> empty | <stat> <mStat>
+    // <mStat>: empty | <stat> <mStat>
     if (root->label == "<mStat>")
     {
         if (root->tokens.empty())
@@ -238,7 +217,7 @@ void staticSemantics(node_t *root)
         }
     }
     
-    // <in> -> read ( Identifier ):
+    // <in>: scan Identifier .
     if (root->label == "<in>")
     {
         temp.token = root->tokens.front();
@@ -255,7 +234,7 @@ void staticSemantics(node_t *root)
         return;
     }
     
-    // <out> -> print ( <expr> ) :
+    // <out>: out [ <expr> ] .
     if (root->label == "<out>")
     {
         int local_var = temp_vars;
@@ -269,7 +248,7 @@ void staticSemantics(node_t *root)
         return;
     }
     
-    // <if> -> cond (<expr> <RO> <expr>) <stat>
+    // <if> -> if (<expr> <RO> <expr>) <stat>
     if (root->label == "<if>")
     {
         int loop = ++num_repeat;
@@ -290,7 +269,7 @@ void staticSemantics(node_t *root)
         return;
     }
     
-    // <loop> -> iter (<expr> <RO> <expr>) <stat>
+    // <loop> -> loop (<expr> <RO> <expr>) <stat>
     if (root->label == "<loop>")
     {
         int loop = ++num_repeat;
@@ -311,7 +290,7 @@ void staticSemantics(node_t *root)
         target_file << "branch" << loop << ": NOOP\n";
     }
     
-    // <assign> -> Identifier = <expr> :
+    // <assign> -> let Identifier = <expr> .
     if (root->label == "<assign>")
     {
         temp.token = root->tokens.front();
@@ -332,7 +311,7 @@ void staticSemantics(node_t *root)
         temp.token = root->tokens.front();
         temp.scope = var_scope;
         root->tokens.erase(root->tokens.begin());
-        if (operator_map[temp.token.desc] == "LESS_tk")
+        if (operator_map[temp.token.desc] == "lessthan_tk")
         {
             if (!root->tokens.empty())
             {
@@ -341,7 +320,7 @@ void staticSemantics(node_t *root)
                 temp_2.scope = var_scope;
                 root->tokens.erase(root->tokens.begin());
                 
-                if (operator_map[temp_2.token.desc] == "EQUALS_tk")
+                if (operator_map[temp_2.token.desc] == "eq_tk")
                 {
                     target_file << "BRNEG branch" << num_repeat << "\n";
                     return;
@@ -351,7 +330,7 @@ void staticSemantics(node_t *root)
             target_file << "BRZNEG branch" << num_repeat << "\n";
             return;
         }
-        else if (operator_map[temp.token.desc] == "GREAT_tk")
+        else if (operator_map[temp.token.desc] == "greaterthan_tk")
         {
             if (!root->tokens.empty())
             {
@@ -360,9 +339,7 @@ void staticSemantics(node_t *root)
                 temp_2.scope = var_scope;
                 root->tokens.erase(root->tokens.begin());
                 
-                cout << "RO production: token is " << temp_2.token.desc << "\n";
-                
-                if (operator_map[temp_2.token.desc] == "EQUALS_tk")
+                if (operator_map[temp_2.token.desc] == "eq_tk")
                 {
                     target_file << "BRPOS branch" << num_repeat << "\n";
                     return;
@@ -371,7 +348,7 @@ void staticSemantics(node_t *root)
             target_file << "BRZPOS branch" << num_repeat << "\n";
             return;
         }
-        else if (operator_map[temp.token.desc] == "EQUALS_tk")
+        else if (operator_map[temp.token.desc] == "eq_tk")
         {
             if (!root->tokens.empty())
             {
@@ -380,7 +357,7 @@ void staticSemantics(node_t *root)
                 temp_2.scope = var_scope;
                 root->tokens.erase(root->tokens.begin());
                 
-                if (operator_map[temp_2.token.desc] == "EQUALS_tk")
+                if (operator_map[temp_2.token.desc] == "eq_tk")
                 {
                     target_file << "BRZERO branch" << num_repeat << "\n";
                     return;
@@ -393,14 +370,14 @@ void staticSemantics(node_t *root)
         }
     }
 }
-// -----------------------------------------------
-//  check top of stack var
+
+//  Looks through stack
 void check_var(stack_tt var)
 {
     int var_defined = find_var(var);
     if (var_defined > 0)
     {
-        cout << "Error: staticSemantics variable \'" <<
+        cout << "Error: Śtatic Semantics variable \'" <<
         get_token_desc(var.token) << "\' on line " << var.token.line_number
         << " has already been defined in this scope on line "
         << stackk.at(var_defined).token.line_number << ".\n";
@@ -414,7 +391,7 @@ void check_var(stack_tt var)
     }
 }
 
-// ------------------------------------------------------
+
 //  check if var exists on stack
 int check_var_exists(stack_tt var)
 {
@@ -441,8 +418,8 @@ int find_var(stack_tt var)
     
     return -1;
 }
-// -------------------------------------------------------
-// find the location on stack
+
+// Get location of the stack
 int find_on_stack(stack_tt var)
 {
     for (int counter = 0; counter < stackk.size(); counter++)
@@ -458,7 +435,7 @@ int find_on_stack(stack_tt var)
 
 
 
-// delete all vars leaving block
+//  Remove var as they leave the stack
 void remove_local_vars(int scope)
 {
     if (scope > 0)
@@ -474,8 +451,6 @@ void remove_local_vars(int scope)
     }
 }
 
-// ---------------------------------------------------------
-// function to print stack
 void print_stack()
 {
     for (int i = 0; i < stackk.size(); i++)

@@ -1,7 +1,6 @@
 //
 //  parser.cpp
 //  islam.p4
-//
 //  Copyright © 2018 Shaon Islam. All rights reserved.
 //
 
@@ -19,12 +18,12 @@ static string expected_token;
 static Token EMPTY_TOKEN;
 
 /*__________Init Root of Tree Until EOF__________ */
-node_t *parser()
+Node *parser()
 {
     EMPTY_TOKEN.desc = "EMPTY";
     scanner(tk);
     
-    node_t *root = NULL;
+    Node *root = NULL;
     root = program();
 
     if (tk.ID != EOFtk)
@@ -40,10 +39,10 @@ node_t *parser()
 }
 
 /* <program>: void <vars> <block> */
-node_t *program()
+Node *program()
 {
-    node_t *node = create_node("<program>");
-    if ((tk.ID == KEYWORDtk) && (keyword_map[tk.desc] == "VOID_tk"))
+    Node *node = create_node("<program>");
+    if ((tk.ID == KEYWORDtk) && (keyword_map[tk.desc] == "void_tk"))
     {
         scanner(tk);
         node->child_1 = vars();
@@ -59,9 +58,9 @@ node_t *program()
 }
 
 /* <vars>: empty | var Identifier : Integer <vars> */
-node_t *vars()
+Node *vars()
 {
-    node_t *node = create_node("<vars>");
+    Node *node = create_node("<vars>");
     
     if ((tk.ID == KEYWORDtk) && (keyword_map[tk.desc] == "var_tk"))
     {
@@ -113,9 +112,9 @@ node_t *vars()
 
 
 /* <block>: start <vars> <stats> stop */
-node_t *block()
+Node *block()
 {
-    node_t *node = create_node("<block>");
+    Node *node = create_node("<block>");
     
     if ((tk.ID == KEYWORDtk) && (keyword_map[tk.desc] == "start_tk"))
     {
@@ -145,20 +144,20 @@ node_t *block()
 }
 
 /* <expr>: <A> / <expr> | <A> * <expr> | <A> */
-node_t *expr()
+Node *expr()
 {
-    node_t *node = create_node("<expr>");
+    Node *node = create_node("<expr>");
     node->child_1 = A();
     
     if (tk.ID == OPtk)
     {
-        if (operator_map[tk.desc] == "SLASH_tk")
+        if (operator_map[tk.desc] == "slash_tk")
         {
             node->tokens.push_back(tk);
             scanner(tk);
             node->child_2 = expr();
         }
-        else if (operator_map[tk.desc] == "ASTERIK_tk")
+        else if (operator_map[tk.desc] == "asterisk_tk")
         {
             node->tokens.push_back(tk);
             scanner(tk);
@@ -170,20 +169,20 @@ node_t *expr()
 }
 
 /* A: <M> + <A> | <M> - <A> | <M> */
-node_t *A()
+Node *A()
 {
-    node_t *node = create_node("<A>");
+    Node *node = create_node("<A>");
     node->child_1 = M();
     
     if (tk.ID == OPtk)
     {
-        if (operator_map[tk.desc] == "PLUS_tk")
+        if (operator_map[tk.desc] == "plus_tk")
         {
             node->tokens.push_back(tk);
             scanner(tk);
             node->child_2 = A();
         }
-        else if (operator_map[tk.desc] == "MINUS_tk")
+        else if (operator_map[tk.desc] == "minus_tk")
         {
             node->tokens.push_back(tk);
             scanner(tk);
@@ -195,11 +194,11 @@ node_t *A()
 }
 
 /* <M>: -<M> | <R> */
-node_t *M()
+Node *M()
 {
-    node_t *node = create_node("<M>");
+    Node *node = create_node("<M>");
     
-    if ((tk.ID == OPtk) && (operator_map[tk.desc] == "MINUS_tk"))
+    if ((tk.ID == OPtk) && (operator_map[tk.desc] == "minus_tk"))
     {
         node->tokens.push_back(tk);
         scanner(tk);
@@ -212,16 +211,16 @@ node_t *M()
 }
 
 /* <R>: (<expr>) | Identifier | Integer */
-node_t *R()
+Node *R()
 {
-    node_t *node = create_node("<R>");
+    Node *node = create_node("<R>");
     
-    if ((tk.ID == OPtk) && (operator_map[tk.desc] == "OPAR_tk"))
+    if ((tk.ID == OPtk) && (operator_map[tk.desc] == "leftparenthesis_tk"))
     {
         scanner(tk);
         node->child_1 = expr();
         
-        if ((tk.ID == OPtk) && (operator_map[tk.desc] == "CPAR_tk"))
+        if ((tk.ID == OPtk) && (operator_map[tk.desc] == "rightparenthesis_tk"))
         {
             scanner(tk);
             return node;
@@ -254,9 +253,9 @@ node_t *R()
 }
 
 /* <stats>: <stat> <mStat> */
-node_t *stats()
+Node *stats()
 {
-    node_t *node = create_node("<stats>");
+    Node *node = create_node("<stats>");
     node->child_1 = stat();
     node->child_2 = mStat();
     
@@ -264,9 +263,9 @@ node_t *stats()
 }
 
 /* <mStat>: empty | <stat> <mStat> */
-node_t *mStat()
+Node *mStat()
 {
-    node_t *node = create_node("<mStat>");
+    Node *node = create_node("<mStat>");
     
     if ( ((tk.ID == KEYWORDtk)&&
           ( (keyword_map[tk.desc] == "out_tk") || (keyword_map[tk.desc] == "scan_tk")
@@ -287,22 +286,19 @@ node_t *mStat()
 
 
 /* <stat>: <in> | <out> | <block> | <if> | <block> | <loop> | <assign> */
-node_t *stat()
+Node *stat()
 {
-    node_t *node = create_node("<stat>");
-    cout << "IN stats\n";
+    Node *node = create_node("<stat>");
     if (tk.ID == KEYWORDtk)
     {
         if (keyword_map[tk.desc] == "out_tk")
         {
-            cout << "IN OUT\n";
             scanner(tk);
             node->child_1 = out();
             return node;
         }
         else if (keyword_map[tk.desc] == "scan_tk")
         {
-            cout << "IN IN\n";
             scanner(tk);
             node->child_1 = in();
             return node;
@@ -336,10 +332,9 @@ node_t *stat()
 }
 
 /* <in>: scan Identifier . */
-node_t *in()
+Node *in()
 {
-    node_t *node = create_node("<in>");
-    //scanner(tk);
+    Node *node = create_node("<in>");
         
     if (tk.ID == ID_tk)
     {
@@ -368,15 +363,15 @@ node_t *in()
 
 
 /* <out>: out [ <expr>  ] . */
-node_t *out()
+Node *out()
 {
-    node_t *node = create_node("<out>");
-    if ((tk.ID == OPtk) && (operator_map[tk.desc] == "OBRACKET_tk"))
+    Node *node = create_node("<out>");
+    if ((tk.ID == OPtk) && (operator_map[tk.desc] == "leftbracket_tk"))
     {
         scanner(tk);
         node->child_1 = expr();
         
-        if ((tk.ID == OPtk) && (operator_map[tk.desc] == "CBRACKET_tk"))
+        if ((tk.ID == OPtk) && (operator_map[tk.desc] == "rightbracket_tk"))
         {
             scanner(tk);
             if ((tk.ID == OPtk) && (operator_map[tk.desc] == "period_tk"))
@@ -407,10 +402,10 @@ node_t *out()
 }
 
 /* <if> -> if (<expr> <RO> <expr>) <stat> */
-node_t *ifs()
+Node *ifs()
 {
-    node_t *node = create_node("<if>");
-    if ((tk.ID == OPtk) && (operator_map[tk.desc] == "OPAR_tk"))
+    Node *node = create_node("<if>");
+    if ((tk.ID == OPtk) && (operator_map[tk.desc] == "leftparenthesis_tk"))
     {
         scanner(tk);
         
@@ -418,7 +413,7 @@ node_t *ifs()
         node->child_2 = RO();
         node->child_3 = expr();
         
-        if ((tk.ID == OPtk) && (operator_map[tk.desc] == "CPAR_tk"))
+        if ((tk.ID == OPtk) && (operator_map[tk.desc] == "rightparenthesis_tk"))
         {
             scanner(tk);
             node->child_4 = stat();
@@ -441,11 +436,11 @@ node_t *ifs()
 }
 
 /* <loop> -> loop (<expr> <RO> <expr>) <stat> */
-node_t *loop()
+Node *loop()
 {
-    node_t *node = create_node("<loop>");
+    Node *node = create_node("<loop>");
     
-    if ((tk.ID == OPtk) && (operator_map[tk.desc] == "OPAR_tk"))
+    if ((tk.ID == OPtk) && (operator_map[tk.desc] == "leftparenthesis_tk"))
     {
         scanner(tk);
         
@@ -453,7 +448,7 @@ node_t *loop()
         node->child_2 = RO();
         node->child_3 = expr();
         
-        if ((tk.ID == OPtk) && (operator_map[tk.desc] == "CPAR_tk"))
+        if ((tk.ID == OPtk) && (operator_map[tk.desc] == "rightparenthesis_tk"))
         {
             scanner(tk);
             node->child_4 = stat();
@@ -475,11 +470,10 @@ node_t *loop()
     }
 }
 
-/* _________________ LET IF STATEMENT_________*/
 /* <assign> -> let Identifier = <expr> . */
-node_t *assign()
+Node *assign()
 {
-    node_t *node = create_node("<assign>");
+    Node *node = create_node("<assign>");
     //scanner(tk);
     
     if (tk.ID == ID_tk)
@@ -487,7 +481,7 @@ node_t *assign()
         node->tokens.push_back(tk);
         scanner(tk);
 
-        if ((tk.ID == OPtk) && (operator_map[tk.desc] == "EQUALS_tk"))
+        if ((tk.ID == OPtk) && (operator_map[tk.desc] == "eq_tk"))
         {
             scanner(tk);
             node->child_1 = expr();
@@ -520,25 +514,25 @@ node_t *assign()
 }
 
 /* <RO> -> < | < = | > | > = | = = | = */
-node_t *RO()
+Node *RO()
 {
-    node_t *node = create_node("<RO>");
+    Node *node = create_node("<RO>");
     //check for operator tokens
     if (tk.ID == OPtk)
     {
-        if (operator_map[tk.desc] == "LESS_tk")
+        if (operator_map[tk.desc] == "lessthan_tk")
         {
             node->tokens.push_back(tk);
             scanner(tk);
             
-            if ((tk.ID == OPtk) && (operator_map[tk.desc] == "EQUALS_tk"))
+            if ((tk.ID == OPtk) && (operator_map[tk.desc] == "eq_tk"))
             {
                 node->tokens.push_back(tk);
                 scanner(tk);
                 return node;
             }
-            else if ((tk.ID == OPtk) && (operator_map[tk.desc] != "EQUALS_tk")
-                     && (operator_map[tk.desc] != "OPAR_tk"))
+            else if ((tk.ID == OPtk) && (operator_map[tk.desc] != "eq_tk")
+                     && (operator_map[tk.desc] != "leftparenthesis_tk"))
             {
                 expected_token.assign("< =");
                 parser_error();
@@ -547,19 +541,19 @@ node_t *RO()
             else
                 return node;
         }
-        else if (operator_map[tk.desc] == "GREAT_tk")
+        else if (operator_map[tk.desc] == "greaterthan_tk")
         {
             node->tokens.push_back(tk);
             scanner(tk);
             
-            if ((tk.ID == OPtk) && (operator_map[tk.desc] == "EQUALS_tk"))
+            if ((tk.ID == OPtk) && (operator_map[tk.desc] == "eq_tk"))
             {
                 node->tokens.push_back(tk);
                 scanner(tk);
                 return node;
             }
-            else if ((tk.ID == OPtk) && (operator_map[tk.desc] != "EQUALS_tk")
-                     && (operator_map[tk.desc] != "OPAR_tk"))
+            else if ((tk.ID == OPtk) && (operator_map[tk.desc] != "eq_tk")
+                     && (operator_map[tk.desc] != "leftparenthesis_tk"))
             {
                 expected_token.assign("> = ");
                 parser_error();
@@ -568,19 +562,19 @@ node_t *RO()
             else
                 return node;
         }
-        else if (operator_map[tk.desc] == "EQUALS_tk")
+        else if (operator_map[tk.desc] == "eq_tk")
         {
             node->tokens.push_back(tk);
             scanner(tk);
             
-            if ((tk.ID == OPtk) && (operator_map[tk.desc] == "EQUALS_tk"))
+            if ((tk.ID == OPtk) && (operator_map[tk.desc] == "eq_tk"))
             {
                 node->tokens.push_back(tk);
                 scanner(tk);
                 return node;
             }
-            else if ((tk.ID == OPtk) && (operator_map[tk.desc] != "EQUALS_tk")
-                     && (operator_map[tk.desc] != "OPAR_tk"))
+            else if ((tk.ID == OPtk) && (operator_map[tk.desc] != "eq_tk")
+                     && (operator_map[tk.desc] != "leftparenthesis_tk"))
             {
                 expected_token.assign("= =");
                 parser_error();
@@ -591,14 +585,14 @@ node_t *RO()
         }
         else
         {
-            expected_token.assign("< or < = or > or > = or = or = = ");
+            expected_token.assign("< | < = | > | > = | = | = = ");
             parser_error();
             exit(1);
         }
     }
     else
     {
-        expected_token.assign("< or < = or > or > = or = or = =");
+        expected_token.assign("< | < = | > | > = | = | = =");
         parser_error();
         exit(1);
     }
@@ -607,16 +601,16 @@ node_t *RO()
 /*______ERROR_________*/
 void parser_error()
 {
-    cout << "Error: parser - line number " << tk.line_number <<
-    ": expected '" << expected_token << "' but received '" << tk.desc << "'\n";
+    cout << "ERROR: From Parser: Line # " << tk.line_number <<
+    ":\nshould be " << expected_token << "\ninstead:  " << tk.desc << "\n";
     exit(EXIT_FAILURE);
 }
 
 
 /* _______Init New Nodes________ */
-node_t *create_node(string production_name)
+Node *create_node(string production_name)
 {
-    node_t *node = new node_t();
+    Node *node = new Node();
     node->child_1 = NULL;
     node->child_2 = NULL;
     node->child_3 = NULL;

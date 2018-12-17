@@ -1,18 +1,13 @@
 //
 //  testTree.cpp
 //  islam.p4
-//
-//  Created by Shaon Islam on 12/17/18.
 //  Copyright © 2018 Shaon Islam. All rights reserved.
-//
 
 #include "testTree.hpp"
 #include <string>
 #include <iostream>
 
-
-//to print the tree
-void preorder(node_t *node, int level)
+void preorder(Node *node, int level)
 {
     if (node == NULL)
         return;

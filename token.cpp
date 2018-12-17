@@ -1,62 +1,51 @@
 //
 //  token.cpp
 //  islam.p4
-//
-//  Created by Shaon Islam on 12/16/18.
 //  Copyright © 2018 Shaon Islam. All rights reserved.
 //
 
 #include "token.hpp"
-
-//token.cpp
-
 #include <iostream>
 #include <string>
 #include <map>
 
 using namespace std;
-
-//Extern map from token.h
 map<string, string> operator_map;
-
-//Extern var from token.h
 map<string, string> keyword_map;
 
-void populate_operator_map()
+void setupOperators()
 {
-    operator_map.insert(make_pair("=", "EQUALS_tk"));
-    operator_map.insert(make_pair("<", "LESS_tk"));
+    operator_map.insert(make_pair("=", "eq_tk"));
+    operator_map.insert(make_pair("<", "lessthan_tk"));
     operator_map.insert(make_pair(":", "colon_tk"));
-    operator_map.insert(make_pair(">", "GREAT_tk"));
-    operator_map.insert(make_pair("+", "PLUS_tk"));
-    operator_map.insert(make_pair("-", "MINUS_tk"));
-    operator_map.insert(make_pair("*", "ASTERIK_tk"));
-    operator_map.insert(make_pair("/", "SLASH_tk"));
-    operator_map.insert(make_pair("%", "PCT_tk"));
+    operator_map.insert(make_pair(">", "greaterthan_tk"));
+    operator_map.insert(make_pair("+", "plus_tk"));
+    operator_map.insert(make_pair("-", "minus_tk"));
+    operator_map.insert(make_pair("*", "asterisk_tk"));
+    operator_map.insert(make_pair("/", "slash_tk"));
+    operator_map.insert(make_pair("%", "percent_tk"));
     operator_map.insert(make_pair(".", "period_tk"));
-    operator_map.insert(make_pair("(", "OPAR_tk"));
-    operator_map.insert(make_pair(")", "CPAR_tk"));
-    operator_map.insert(make_pair(",", "COMMA_tk"));
-    operator_map.insert(make_pair("{", "OBRACE_tk"));
-    operator_map.insert(make_pair("}", "CBRACE_tk"));
-    operator_map.insert(make_pair(";", "SCOLON_tk"));
-    operator_map.insert(make_pair("[", "OBRACKET_tk"));
-    operator_map.insert(make_pair("]", "CBRACKET_tk"));
+    operator_map.insert(make_pair("(", "leftparenthesis_tk"));
+    operator_map.insert(make_pair(")", "rightparenthesis_tk"));
+    operator_map.insert(make_pair(",", "comma_tk"));
+    operator_map.insert(make_pair("{", "leftbrace_tk"));
+    operator_map.insert(make_pair("}", "rightbrace_tk"));
+    operator_map.insert(make_pair(";", "semicolon_tk"));
+    operator_map.insert(make_pair("[", "leftbracket_tk"));
+    operator_map.insert(make_pair("]", "rightbracket_tk"));
 }
 
-void populate_keyword_map()
+void setupKeywords()
 {
     keyword_map.insert(make_pair("start", "start_tk"));
     keyword_map.insert(make_pair("stop", "stop_tk"));
     keyword_map.insert(make_pair("loop", "loop_tk"));
-    keyword_map.insert(make_pair("void", "VOID_tk"));
+    keyword_map.insert(make_pair("void", "void_tk"));
     keyword_map.insert(make_pair("var", "var_tk"));
-    keyword_map.insert(make_pair("return", "RETURN_tk"));
     keyword_map.insert(make_pair("scan", "scan_tk"));
     keyword_map.insert(make_pair("out", "out_tk"));
-    keyword_map.insert(make_pair("program", "PROGRAM_tk"));
+    keyword_map.insert(make_pair("program", "program_tk"));
     keyword_map.insert(make_pair("if", "if_tk"));
-    keyword_map.insert(make_pair("then", "THEN_tk"));
     keyword_map.insert(make_pair("var", "var_tk"));
     keyword_map.insert(make_pair("let", "let_tk"));
 }
