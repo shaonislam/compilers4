@@ -1,0 +1,10 @@
+void
+var x : 0 
+start
+  scan x . 
+  loop ( x > 0 )
+  start
+    out [ x ] .
+    let x = x - 2 .
+  stop
+stop

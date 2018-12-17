@@ -1,0 +1,16 @@
+void
+var x : 0
+var y : 0
+start
+  scan x .
+  loop ( x > 0 )
+  start
+    let y = x .
+    loop ( y > = 0 )
+    start
+      out [ y ] .
+      let y = y - 1 .
+    stop
+    let x = x - 1 .
+  stop
+stop

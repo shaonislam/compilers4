@@ -1,0 +1,7 @@
+void
+var x : 0 
+start
+  scan x .
+  if ( x = = 1 - 1 )
+    out [ - x  ] .
+stop
